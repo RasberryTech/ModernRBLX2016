@@ -96,8 +96,8 @@ final class RobloxService: ObservableObject {
     @Published private(set) var mode: DataMode
     @Published private(set) var isLoading = false
     @Published private(set) var lastError: ServiceError?
+    @Published private(set) var baseURL: URL
 
-    private let baseURL: URL
     private let session: URLSession
     private let cache = ResponseCache()
     private let decoder = JSONDecoder()
@@ -111,6 +111,19 @@ final class RobloxService: ObservableObject {
     func setMode(_ mode: DataMode) {
         self.mode = mode
         lastError = nil
+    }
+
+    @discardableResult
+    func setBaseURL(_ string: String) -> Bool {
+        guard let url = URL(string: string.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let scheme = url.scheme,
+              scheme == "http" || scheme == "https",
+              url.host != nil else {
+            return false
+        }
+        baseURL = url
+        lastError = nil
+        return true
     }
 
     func clearCache() async {
