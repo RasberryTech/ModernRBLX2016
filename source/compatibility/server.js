@@ -5,7 +5,8 @@ const {
   getPublicServers,
   getAvatarThumbnail,
   getGameThumbnail,
-  getAssetDetails
+  getAssetDetails,
+  searchAvatarItems
 } = require("./index");
 
 const PORT = Number(process.env.PORT || 3000);
@@ -43,7 +44,7 @@ async function route(req, res) {
   try {
     if (path === "/api/config") {
       return send(res, 200, {
-        version: 1,
+        version: 2,
         clientStyle: "2016",
         compatibility: {
           users: true,
@@ -52,10 +53,12 @@ async function route(req, res) {
           avatarThumbnails: true,
           gameThumbnails: true,
           assetDetails: true,
+          marketplaceSearch: true,
+          marketplacePurchase: "official-prompt-only",
           authentication: false,
           websocket: false
         },
-        note: "Authentication and persistent networking require supported Roblox integration and are intentionally not implemented as security bypasses."
+        note: "Marketplace search is read-only. Purchases must use a supported Roblox purchase prompt; this service never receives payment credentials."
       });
     }
 
@@ -93,6 +96,23 @@ async function route(req, res) {
       const id = idFrom(path, "/api/assets/");
       if (!id) return send(res, 400, { error: "Invalid asset ID" });
       return send(res, 200, await getAssetDetails(id));
+    }
+
+    if (path === "/api/marketplace/items") {
+      return send(res, 200, await searchAvatarItems({
+        keyword: url.searchParams.get("keyword") || "",
+        category: url.searchParams.get("category") || "",
+        salesTypeFilter: url.searchParams.get("salesTypeFilter") || "1",
+        limit: url.searchParams.get("limit") || 30,
+        cursor: url.searchParams.get("cursor") || ""
+      }));
+    }
+
+    if (path === "/api/marketplace/purchase") {
+      return send(res, 501, {
+        error: "Direct purchase is not implemented",
+        reason: "Purchases must be initiated through a supported Roblox purchase prompt. ModernRBLX2016 does not collect payment credentials or emulate Roblox checkout."
+      });
     }
 
     if (path === "/api/auth") {
