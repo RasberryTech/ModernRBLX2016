@@ -1,11 +1,12 @@
 {
   "name": "modernrblx2016-compatibility",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Supported compatibility service for the ModernRBLX2016 project",
   "main": "source/compatibility/server.js",
   "scripts": {
-    "start": "node source/compatibility/server.js"
+    "start": "node source/compatibility/server.js",
+    "test": "node source/compatibility/test.js"
   },
   "engines": {
     "node": ">=18"
