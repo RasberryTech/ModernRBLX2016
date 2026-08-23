@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 /// Eligibility state supplied by the project's supported account-service integration.
 enum AccountEligibility: Equatable {
