@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var environment: ServiceEnvironment
+    @State private var endpointDraft = ""
+    @State private var endpointMessage: String?
 
     var body: some View {
         Form {
@@ -20,6 +22,30 @@ struct SettingsView: View {
                      : "Mock mode keeps the UI usable without a network connection.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+            }
+
+            Section("Compatibility server") {
+                TextField("Server URL", text: $endpointDraft)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+                    .textContentType(.URL)
+
+                Button("Save server URL") {
+                    endpointMessage = environment.setEndpoint(endpointDraft)
+                        ? "Server URL saved."
+                        : "Enter a valid http:// or https:// URL."
+                }
+
+                Text("Current: \(environment.endpoint)")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                if let endpointMessage {
+                    Text(endpointMessage)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Section("Cache") {
@@ -48,6 +74,7 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+        .onAppear { endpointDraft = environment.endpoint }
     }
 }
 
