@@ -2,7 +2,8 @@ const BASES = Object.freeze({
   users: "https://users.roblox.com",
   games: "https://games.roblox.com",
   thumbnails: "https://thumbnails.roblox.com",
-  economy: "https://economy.roblox.com"
+  economy: "https://economy.roblox.com",
+  catalog: "https://catalog.roblox.com"
 });
 
 async function request(url, options = {}) {
@@ -49,6 +50,16 @@ async function getAssetDetails(assetId) {
   return request(`${BASES.economy}/v2/assets/${encodeURIComponent(assetId)}/details`);
 }
 
+async function searchAvatarItems({ keyword = "", category = "", salesTypeFilter = "1", limit = 30, cursor = "" } = {}) {
+  const params = new URLSearchParams();
+  params.set("keyword", keyword);
+  params.set("salesTypeFilter", String(salesTypeFilter));
+  params.set("limit", String(Math.min(Math.max(Number(limit) || 10, 10), 120)));
+  if (category) params.set("category", category);
+  if (cursor) params.set("cursor", cursor);
+  return request(`${BASES.catalog}/v1/search/items/details?${params.toString()}`);
+}
+
 module.exports = {
   BASES,
   getUser,
@@ -56,5 +67,6 @@ module.exports = {
   getPublicServers,
   getAvatarThumbnail,
   getGameThumbnail,
-  getAssetDetails
+  getAssetDetails,
+  searchAvatarItems
 };
