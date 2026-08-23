@@ -14,16 +14,35 @@ A research and compatibility project centered on the classic Roblox iOS experien
 
 ```text
 ModernRBLX2016/
-├── analysis/       # Notes about the legacy application and compatibility research
-├── docs/           # Project documentation
-├── source/         # Original project source code
+├── analysis/       # Compatibility research and observed legacy behavior
+├── docs/           # Architecture and project documentation
+├── source/
 │   ├── ui/         # 2016-style UI implementation
 │   ├── resources/  # Project-owned UI resources and references
-│   └── analysis/   # Source-level research notes
+│   ├── analysis/   # Source-level research notes
+│   └── compatibility/
+│       ├── index.js    # Supported upstream service adapters
+│       ├── client.js   # Client-facing compatibility API
+│       ├── server.js   # Project-owned HTTP compatibility service
+│       ├── test.js     # Unit checks
+│       └── README.md
 ├── tools/          # Utilities used during development and analysis
+├── package.json
 ├── .gitignore
 └── README.md
 ```
+
+## Compatibility service
+
+The project now contains a small Node.js compatibility service that keeps the 2016-style UI separate from modern service details.
+
+```bash
+npm install
+npm test
+npm start
+```
+
+The service listens on `http://localhost:3000` by default and exposes project-owned routes for user lookup, game lookup, public server discovery, thumbnails, asset details, and configuration.
 
 ## Original IPA
 
@@ -31,7 +50,7 @@ The original Roblox IPA should remain outside this public repository. Keep a loc
 
 ## Status
 
-🚧 Early development — repository structure and research phase.
+🚧 Early development — compatibility service foundation is implemented; legacy-client mapping and UI integration remain under active research.
 
 ## Scope
 
