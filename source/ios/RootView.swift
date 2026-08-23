@@ -24,11 +24,11 @@ struct RootView: View {
             case .home:
                 HomeView()
             case .games:
-                PlaceholderView(title: "Games")
+                GamesView()
             case .avatar:
                 PlaceholderView(title: "Avatar")
             case .profile:
-                PlaceholderView(title: "Profile")
+                ProfileView()
             case .settings:
                 SettingsView()
             }
@@ -41,14 +41,6 @@ struct RootView: View {
                     .background(.regularMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
-        }
-        .alert("Connection error", isPresented: Binding(
-            get: { environment.service.lastError != nil },
-            set: { newValue in if !newValue { environment.service.setMode(environment.mode) } }
-        )) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(environment.service.lastError?.localizedDescription ?? "Unknown service error")
         }
     }
 }
