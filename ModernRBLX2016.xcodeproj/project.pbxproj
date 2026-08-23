@@ -7,7 +7,7 @@
     A00000000000000000000001 = { isa = PBXProject; buildConfigurationList = A00000000000000000000010; compatibilityVersion = "Xcode 3.2"; developmentRegion = en; knownRegions = (en, Base); mainGroup = A00000000000000000000002; productRefGroup = A00000000000000000000003; projectDirPath = ""; projectRoot = ""; targets = (A00000000000000000000060); };
     A00000000000000000000002 = { isa = PBXGroup; children = (A00000000000000000000030, A00000000000000000000003); sourceTree = "<group>"; };
     A00000000000000000000003 = { isa = PBXGroup; children = (A00000000000000000000040); name = Products; sourceTree = "<group>"; };
-    A00000000000000000000030 = { isa = PBXGroup; children = (A00000000000000000000033, A00000000000000000000034, A00000000000000000000035, A00000000000000000000036, A00000000000000000000037, A00000000000000000000038, A00000000000000000000039); path = source/ios; sourceTree = "<group>"; };
+    A00000000000000000000030 = { isa = PBXGroup; children = (A00000000000000000000033, A00000000000000000000034, A00000000000000000000000035, A00000000000000000000000036, A00000000000000000000000037, A00000000000000000000000038, A00000000000000000000000039, A0000000000000000000000003A, A0000000000000000000000003B, A0000000000000000000000003C, A0000000000000000000000003D); path = source/ios; sourceTree = "<group>"; };
     A00000000000000000000033 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernRBLX2016App.swift; sourceTree = "<group>"; };
     A00000000000000000000034 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
     A00000000000000000000035 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -15,8 +15,12 @@
     A00000000000000000000037 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLayer.swift; sourceTree = "<group>"; };
     A00000000000000000000038 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceEnvironment.swift; sourceTree = "<group>"; };
     A00000000000000000000039 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+    A0000000000000000000003A = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Eligibility.swift; sourceTree = "<group>"; };
+    A0000000000000000000003B = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountGateView.swift; sourceTree = "<group>"; };
+    A0000000000000000000003C = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesView.swift; sourceTree = "<group>"; };
+    A0000000000000000000003D = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
     A00000000000000000000040 = { isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModernRBLX2016.app; sourceTree = BUILT_PRODUCTS_DIR; };
-    A00000000000000000000050 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000051, A00000000000000000000052, A00000000000000000000000053, A00000000000000000000000054, A00000000000000000000000055, A00000000000000000000000056, A00000000000000000000000057); runOnlyForDeploymentPostprocessing = 0; };
+    A00000000000000000000050 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000051, A00000000000000000000052, A00000000000000000000000053, A00000000000000000000000054, A00000000000000000000000055, A00000000000000000000000056, A00000000000000000000000057, A00000000000000000000000058, A00000000000000000000000059, A0000000000000000000000005A, A0000000000000000000000005B); runOnlyForDeploymentPostprocessing = 0; };
     A00000000000000000000051 = { isa = PBXBuildFile; fileRef = A00000000000000000000033; };
     A00000000000000000000052 = { isa = PBXBuildFile; fileRef = A00000000000000000000034; };
     A00000000000000000000053 = { isa = PBXBuildFile; fileRef = A00000000000000000000035; };
@@ -24,6 +28,10 @@
     A00000000000000000000055 = { isa = PBXBuildFile; fileRef = A00000000000000000000037; };
     A00000000000000000000056 = { isa = PBXBuildFile; fileRef = A00000000000000000000038; };
     A00000000000000000000057 = { isa = PBXBuildFile; fileRef = A00000000000000000000039; };
+    A00000000000000000000058 = { isa = PBXBuildFile; fileRef = A0000000000000000000003A; };
+    A00000000000000000000059 = { isa = PBXBuildFile; fileRef = A0000000000000000000003B; };
+    A0000000000000000000005A = { isa = PBXBuildFile; fileRef = A0000000000000000000003C; };
+    A0000000000000000000005B = { isa = PBXBuildFile; fileRef = A0000000000000000000003D; };
     A00000000000000000000060 = { isa = PBXNativeTarget; buildConfigurationList = A00000000000000000000011; buildPhases = (A00000000000000000000050); buildRules = (); dependencies = (); name = ModernRBLX2016; productName = ModernRBLX2016; productReference = A00000000000000000000040; productType = "com.apple.product-type.application"; };
     A00000000000000000000010 = { isa = XCConfigurationList; buildConfigurations = (A00000000000000000000070, A00000000000000000000071); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
     A00000000000000000000011 = { isa = XCConfigurationList; buildConfigurations = (A00000000000000000000072, A00000000000000000000073); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
