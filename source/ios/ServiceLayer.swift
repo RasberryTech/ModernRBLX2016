@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 struct RBLXUser: Codable, Identifiable, Equatable {
     let id: Int
@@ -56,6 +57,14 @@ enum ServiceError: LocalizedError, Equatable {
     }
 }
 
+private struct ListResponse<T: Decodable>: Decodable {
+    let data: [T]
+}
+
+private struct GameListResponse: Decodable {
+    let data: [RBLXGame]
+}
+
 actor ResponseCache {
     private struct Entry {
         let data: Data
@@ -91,6 +100,7 @@ final class RobloxService: ObservableObject {
     private let baseURL: URL
     private let session: URLSession
     private let cache = ResponseCache()
+    private let decoder = JSONDecoder()
 
     init(mode: DataMode = .mock, baseURL: URL = URL(string: "http://localhost:3000")!, session: URLSession = .shared) {
         self.mode = mode
@@ -112,20 +122,51 @@ final class RobloxService: ObservableObject {
     }
 
     func game(universeId: Int) async -> Result<RBLXGame, ServiceError> {
-        await perform(path: "/api/games/\(universeId)", cacheKey: "game:\(universeId)", ttl: 120, mock: MockData.game(universeId: universeId))
+        guard mode != .mock else { return .success(MockData.game(universeId: universeId)) }
+        let response: Result<GameListResponse, ServiceError> = await perform(
+            path: "/api/games/\(universeId)",
+            cacheKey: "game:\(universeId)",
+            ttl: 120,
+            mock: GameListResponse(data: [MockData.game(universeId: universeId)])
+        )
+        switch response {
+        case .success(let list):
+            guard let game = list.data.first else { return .failure(.invalidResponse) }
+            return .success(game)
+        case .failure(let error):
+            return .failure(error)
+        }
     }
 
     func servers(placeId: Int, limit: Int = 50) async -> Result<[RBLXServer], ServiceError> {
         let safeLimit = min(max(limit, 10), 100)
-        return await perform(path: "/api/games/\(placeId)/servers?limit=\(safeLimit)", cacheKey: "servers:\(placeId):\(safeLimit)", ttl: 30, mock: MockData.servers(placeId: placeId))
+        let response: Result<ListResponse<RBLXServer>, ServiceError> = await perform(
+            path: "/api/games/\(placeId)/servers?limit=\(safeLimit)",
+            cacheKey: "servers:\(placeId):\(safeLimit)",
+            ttl: 30,
+            mock: ListResponse(data: MockData.servers(placeId: placeId))
+        )
+        return response.map(\.data)
     }
 
     func avatarThumbnail(userId: Int) async -> Result<RBLXThumbnail?, ServiceError> {
-        await perform(path: "/api/thumbnails/users/\(userId)", cacheKey: "avatar:\(userId)", ttl: 300, mock: MockData.avatarThumbnail(userId: userId))
+        let response: Result<ListResponse<RBLXThumbnail>, ServiceError> = await perform(
+            path: "/api/thumbnails/users/\(userId)",
+            cacheKey: "avatar:\(userId)",
+            ttl: 300,
+            mock: ListResponse(data: [MockData.avatarThumbnail(userId: userId)].compactMap { $0 })
+        )
+        return response.map { $0.data.first }
     }
 
     func gameThumbnail(universeId: Int) async -> Result<RBLXThumbnail?, ServiceError> {
-        await perform(path: "/api/thumbnails/games/\(universeId)", cacheKey: "game-thumb:\(universeId)", ttl: 300, mock: MockData.gameThumbnail(universeId: universeId))
+        let response: Result<ListResponse<RBLXThumbnail>, ServiceError> = await perform(
+            path: "/api/thumbnails/games/\(universeId)",
+            cacheKey: "game-thumb:\(universeId)",
+            ttl: 300,
+            mock: ListResponse(data: [MockData.gameThumbnail(universeId: universeId)].compactMap { $0 })
+        )
+        return response.map { $0.data.first }
     }
 
     private func perform<T: Decodable>(path: String, cacheKey: String, ttl: TimeInterval, mock: T) async -> Result<T, ServiceError> {
@@ -137,12 +178,8 @@ final class RobloxService: ObservableObject {
             return .success(mock)
         }
 
-        if let cached = await cache.data(for: cacheKey) {
-            do {
-                return .success(try JSONDecoder().decode(T.self, from: cached))
-            } catch {
-                // Ignore stale/corrupt cache and refresh from network.
-            }
+        if let cached = await cache.data(for: cacheKey), let value = try? decoder.decode(T.self, from: cached) {
+            return .success(value)
         }
 
         guard let url = URL(string: path, relativeTo: baseURL)?.absoluteURL else {
@@ -166,7 +203,7 @@ final class RobloxService: ObservableObject {
 
             let value: T
             do {
-                value = try JSONDecoder().decode(T.self, from: data)
+                value = try decoder.decode(T.self, from: data)
             } catch {
                 throw ServiceError.decoding(error.localizedDescription)
             }
@@ -190,7 +227,7 @@ enum MockData {
     }
 
     static func game(universeId: Int) -> RBLXGame {
-        RBLXGame(id: universeId, name: "Classic Roblox Experience", description: "Offline preview experience", rootPlaceId: universeId, playing: 128, visits: 2500000, imageUrl: nil)
+        RBLXGame(id: universeId, name: "Classic Roblox Experience", description: "Offline preview experience", rootPlaceId: universeId, playing: 128, visits: 2_500_000, imageUrl: nil)
     }
 
     static func servers(placeId: Int) -> [RBLXServer] {
