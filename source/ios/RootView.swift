@@ -1,17 +1,32 @@
 import SwiftUI
 
 struct RootView: View {
+    @State private var selection: Screen? = .home
+
     var body: some View {
         NavigationSplitView {
-            List {
-                NavigationLink("Home", value: Screen.home)
-                NavigationLink("Games", value: Screen.games)
-                NavigationLink("Avatar", value: Screen.avatar)
-                NavigationLink("Profile", value: Screen.profile)
+            List(selection: $selection) {
+                Label("Home", systemImage: "house.fill")
+                    .tag(Screen.home)
+                Label("Games", systemImage: "gamecontroller.fill")
+                    .tag(Screen.games)
+                Label("Avatar", systemImage: "person.crop.circle.fill")
+                    .tag(Screen.avatar)
+                Label("Profile", systemImage: "person.fill")
+                    .tag(Screen.profile)
             }
             .navigationTitle("ROBLOX")
         } detail: {
-            HomeView()
+            switch selection ?? .home {
+            case .home:
+                HomeView()
+            case .games:
+                PlaceholderView(title: "Games")
+            case .avatar:
+                PlaceholderView(title: "Avatar")
+            case .profile:
+                PlaceholderView(title: "Profile")
+            }
         }
         .navigationSplitViewStyle(.balanced)
     }
