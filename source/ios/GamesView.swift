@@ -6,6 +6,7 @@ struct GamesView: View {
     @State private var servers: [RBLXServer] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var showGameUI = false
 
     private let demoUniverseID = 1818
 
@@ -23,6 +24,13 @@ struct GamesView: View {
                         if let playing = game.playing {
                             Text("Playing: \(playing)").font(.footnote).foregroundStyle(.secondary)
                         }
+
+                        Button {
+                            showGameUI = true
+                        } label: {
+                            Label("Open 2016 Game UI", systemImage: "play.fill")
+                        }
+                        .buttonStyle(.borderedProminent)
                     }
                 }
             }
@@ -59,6 +67,15 @@ struct GamesView: View {
         .navigationTitle("Games")
         .task { await load() }
         .refreshable { await load() }
+        .fullScreenCover(isPresented: $showGameUI) {
+            if let game {
+                Game2016View(
+                    universeId: game.id,
+                    placeId: game.rootPlaceId ?? game.id
+                )
+                .environmentObject(environment)
+            }
+        }
     }
 
     private func load() async {
