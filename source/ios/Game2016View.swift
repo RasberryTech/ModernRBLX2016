@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// 2016-style game HUD using the project's local `content/textures/ui` resources.
+/// This is the presentation layer; a real Roblox game runtime remains a separate concern.
 struct Game2016View: View {
     @EnvironmentObject private var environment: ServiceEnvironment
     let universeId: Int
@@ -15,7 +17,6 @@ struct Game2016View: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                // Game viewport placeholder. The real Roblox runtime is intentionally separate.
                 LinearGradient(
                     colors: [Color(red: 0.08, green: 0.10, blue: 0.14), Color(red: 0.16, green: 0.18, blue: 0.22)],
                     startPoint: .top,
@@ -65,7 +66,7 @@ struct Game2016View: View {
                 }
             }
         }
-        .statusBar(hidden: true)
+        .statusBarHidden(true)
         .preferredColorScheme(.dark)
         .navigationBarBackButtonHidden(true)
         .task {
@@ -75,34 +76,16 @@ struct Game2016View: View {
 
     private var topBar: some View {
         HStack(spacing: 8) {
-            Text("ROBLOX")
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+            AssetButton(asset: "ButtonLeft.png", fallback: "chevron.left") { showChat.toggle() }
+            AssetButton(asset: "Backpack_Open.png", fallback: "shippingbox") { showBackpack.toggle() }
             Spacer()
-            Button {
-                showChat.toggle()
-            } label: {
-                Image(systemName: "message.fill")
-            }
-            Button {
-                showPlayerList.toggle()
-            } label: {
-                Image(systemName: "person.2.fill")
-            }
-            Button {
-                showBackpack = true
-            } label: {
-                Image(systemName: "shippingbox.fill")
-            }
-            Button {
-                showMenu = true
-            } label: {
-                Image(systemName: "line.3.horizontal")
-            }
+            AssetButton(asset: "ButtonRight.png", fallback: "person.2") { showPlayerList.toggle() }
+            AssetButton(asset: "CloseButton.png", fallback: "line.3.horizontal") { showMenu = true }
         }
-        .foregroundStyle(.white)
         .padding(.horizontal, 12)
-        .frame(height: 44)
-        .background(Color.black.opacity(0.55))
+        .padding(.top, 8)
+        .frame(height: 52)
+        .background(Color.black.opacity(0.42))
     }
 
     private func bottomHud(width: CGFloat, height: CGFloat) -> some View {
@@ -127,16 +110,45 @@ struct Game2016View: View {
             if height > 500 {
                 HStack(spacing: 8) {
                     ForEach(0..<4, id: \.self) { index in
-                        Text("\(index + 1)")
-                            .font(.caption.bold())
-                            .frame(width: 42, height: 42)
-                            .background(Color.black.opacity(0.55))
-                            .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.white.opacity(0.5), lineWidth: 1))
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color.black.opacity(0.55))
+                                .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.white.opacity(0.45), lineWidth: 1))
+                            Text("\(index + 1)")
+                                .font(.caption.bold())
+                                .foregroundStyle(.white)
+                        }
+                        .frame(width: 42, height: 42)
                     }
                 }
                 .padding(.bottom, 118)
             }
         }
+    }
+}
+
+private struct AssetButton: View {
+    let asset: String
+    let fallback: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            if let image = UIAssetLoader.image(named: asset) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                Image(systemName: fallback)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(7)
+                    .foregroundStyle(.white)
+            }
+        }
+        .buttonStyle(.plain)
+        .frame(width: 38, height: 38)
+        .accessibilityLabel(asset.replacingOccurrences(of: ".png", with: ""))
     }
 }
 
@@ -199,10 +211,8 @@ private struct Chat2016: View {
                 HStack(spacing: 6) {
                     TextField("Type a message...", text: $text)
                         .textFieldStyle(.roundedBorder)
-                    Button("Send") {
-                        text = ""
-                    }
-                    .buttonStyle(.bordered)
+                    Button("Send") { text = "" }
+                        .buttonStyle(.bordered)
                 }
             }
             .padding(8)
@@ -220,11 +230,10 @@ private struct Health2016: View {
                 .foregroundStyle(.white)
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.black.opacity(0.65))
+                    RoundedRectangle(cornerRadius: 2).fill(Color.black.opacity(0.65))
                     RoundedRectangle(cornerRadius: 2)
                         .fill(Color.green.opacity(0.9))
-                        .frame(width: proxy.size.width * value)
+                        .frame(width: proxy.size.width * max(0, min(value, 1)))
                 }
             }
             .frame(height: 12)
